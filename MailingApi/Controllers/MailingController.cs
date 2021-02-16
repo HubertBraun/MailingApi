@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MailingApi.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,10 +14,10 @@ namespace MailingApi.Controllers
     [Route("[controller]")]
     public class MailingController : ControllerBase
     {
-
-        public MailingController()
+        private MailGroupContext _context { get; set; }
+        public MailingController(MailGroupContext context)
         {
-
+            context = _context;
         }
         /// <summary>
         /// 
@@ -26,7 +28,7 @@ namespace MailingApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Get()
+        public IActionResult Get(int groupId)
         {
             return NotFound();
         }
@@ -39,7 +41,7 @@ namespace MailingApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult Post()
+        public IActionResult Post(MailingGroup group)
         {
             return NoContent();
         }

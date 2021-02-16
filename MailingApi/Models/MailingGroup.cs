@@ -7,15 +7,13 @@ using System.Threading.Tasks;
 
 namespace MailingApi.Models
 {
-    [Table("MailUser")]
-    public class MailUser
+    [Table("MailingGroup")]
+    public class MailingGroup
     {
         [Key]
-        [Column("usr_id")]
+        [Column("grp_id")]
         public int Id { get; set; }
-        [Column("usr_name")]
-        public string Username { get; set; }
-        [Column("usr_password")]
-        public string Password { get; set; }
+        [Column("grp_name")]
+        public string Name { get; set; }
     }
 }
