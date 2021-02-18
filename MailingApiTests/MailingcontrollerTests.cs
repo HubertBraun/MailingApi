@@ -1,3 +1,4 @@
+using MailingApi.Context;
 using MailingApi.Controllers;
 using MailingApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,43 @@ namespace MailingApiTests
     public class MailingcontrollerTests
     {
         private static MailingController controller;
-        private static MailGroupContext context;
+        private static MailingApiContext context;
 
         [ClassInitialize]
         public static void Initialize(TestContext testcontext)
         {
-            var options = new DbContextOptionsBuilder<MailGroupContext>().UseInMemoryDatabase(databaseName: "MailDatabase").Options;
-            context = new MailGroupContext(options);
+            var options = new DbContextOptionsBuilder<MailingApiContext>().UseInMemoryDatabase(databaseName: "MailDatabase").Options;
+            context = new MailingApiContext(options);
             controller = new MailingController(context);
+
+            var consumer = new MailConsumer
+            {
+                ConsumerAddress = "testAddress",
+            };
+            var owner = new MailUser
+            {
+                Username = "testName1"
+            };
+            var owner2 = new MailUser
+            {
+                Username = "testName2"
+            };
+            var group = new MailingGroup
+            {
+                Name = "testName1",
+                GroupOwnerId = 1,
+            };
+            var group2 = new MailingGroup
+            {
+                Name = "testName2",
+                GroupOwnerId = 2,
+            };
+            context.Add(consumer);
+            context.Add(group);
+            context.Add(group2);
+            context.Add(owner);
+            context.Add(owner2);
+            context.SaveChanges();
         }
         [DataRow(-1)]
         [DataRow(10)]
@@ -35,9 +65,13 @@ namespace MailingApiTests
         [DataRow(2)]
         public void GetShoulReturnOK(int groupId)
         {
-            var expectedGroup = context.Groups.Find(groupId);
-            var actualGroup = controller.Get(groupId);
-            Assert.AreEqual(actualGroup, expectedGroup);
+            var expectedGroup = context.GetBuissnesModelGroup(groupId);
+            var actualGroup = (controller.Get(groupId) as OkObjectResult).Value as BuissnessModelGroup;
+            Assert.AreEqual(actualGroup.GroupId, expectedGroup.GroupId);
+            Assert.AreEqual(actualGroup.GroupName, expectedGroup.GroupName);
+            Assert.AreEqual(actualGroup.OwnerName, expectedGroup.OwnerName);
+            Assert.AreEqual(actualGroup.OwnerId, expectedGroup.OwnerId);
+            Assert.AreEqual(actualGroup.Emails.Count, expectedGroup.Emails.Count);
         }
 
         [TestMethod]

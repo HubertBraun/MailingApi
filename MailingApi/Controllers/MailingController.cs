@@ -1,4 +1,5 @@
-﻿using MailingApi.Models;
+﻿using MailingApi.Context;
+using MailingApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,10 @@ namespace MailingApi.Controllers
     [Route("[controller]")]
     public class MailingController : ControllerBase
     {
-        private MailGroupContext _context { get; set; }
-        public MailingController(MailGroupContext context)
+        private readonly MailingApiContext _context;
+        public MailingController(MailingApiContext context)
         {
-            context = _context;
+            _context = context;
         }
         /// <summary>
         /// 
@@ -30,7 +31,12 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(int groupId)
         {
-            return NotFound();
+            var group = _context.GetBuissnesModelGroup(groupId);
+            if (group is null)
+            {
+                return NotFound();
+            }
+            return Ok(group);
         }
         /// <summary>
         /// 

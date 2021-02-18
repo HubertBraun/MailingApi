@@ -15,5 +15,7 @@ namespace MailingApi.Models
         public int Id { get; set; }
         [Column("grp_name")]
         public string Name { get; set; }
+        [Column("grp_ownerId")]
+        public int GroupOwnerId { get; set; }
     }
 }

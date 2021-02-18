@@ -1,3 +1,4 @@
+using MailingApi.Context;
 using MailingApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,7 @@ namespace MailingApi
         {
             services.AddControllers();
             services.AddSwaggerGen();
-            services.AddDbContext<MailGroupContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MainConnectionString")));
+            services.AddDbContext<MailingApiContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MainConnectionString")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

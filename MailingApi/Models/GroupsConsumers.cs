@@ -7,16 +7,15 @@ using System.Threading.Tasks;
 
 namespace MailingApi.Models
 {
-    [Table("MailConsumer")]
-    public class MailConsumer
+    [Table("GroupsConsumers")]
+    public class GroupsConsumers
     {
         [Key]
-        [Column("con_id")]
-        public int ConsumerId { get; set; }
-        [Column("con_address")]
-        public string ConsumerAddress { get; set; }
-        [Column("con_groupId")]
+        [Column("gc_id")]
+        public int GroupsEmailsId { get; set; }
+        [Column("gc_groupId")]
         public int GroupId { get; set; }
+        [Column("gc_consumerId")]
+        public int ConsumerId { get; set; }
     }
-
 }
