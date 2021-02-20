@@ -21,15 +21,14 @@ namespace MailingApi.Controllers
             _context = context;
         }
         /// <summary>
-        /// 
+        /// Searchs for a group by Id
         /// </summary>
-        /// <returns></returns>
-        /// <response code="404">Group not found</response> 
-        /// <response code="200">OK</response> 
+        /// <returns>Returns one group by Id</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Get(int groupId)
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public IActionResult GetGroupById(int groupId)
         {
             var group = _context.GetBuissnesModel(groupId);
             if (group is null)
@@ -39,31 +38,30 @@ namespace MailingApi.Controllers
             return Ok(group);
         }
         /// <summary>
-        /// 
+        /// Inserts a new group
         /// </summary>
         /// <returns></returns>
-        /// <response code="409">Group already exist</response> 
-        /// <response code="201">Group created</response> 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult Post(BuissnessModelGroup group)
+        public IActionResult PostNewGroup(BuissnessModelGroup group)
         {
-            var result = _context.SaveBuissnesModelGroup(group);
+            var id = _context.SaveBuissnesModelGroup(group);
+            if (id != -1)
+            {
+                return Created("", id); // TODO: routing
+            }
             return NoContent();
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        /// <response code="204">Group not found</response> 
-        /// <response code="201">Group created</response> 
-        /// <response code="200">Group updated</response> 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Put()
+        public IActionResult PutGroup()
         {
             return NoContent();
         }
@@ -71,12 +69,11 @@ namespace MailingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        /// <response code="404">Group not found</response> 
-        /// <response code="200">Group deleted</response> 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Delete()
+        public IActionResult DeleteGroup()
         {
             return NotFound();
         }

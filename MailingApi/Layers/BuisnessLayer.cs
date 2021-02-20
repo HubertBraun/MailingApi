@@ -11,7 +11,7 @@ namespace MailingApi.Layers
     /// </summary>
     public class BuisnessLayer
     {
-        private MailingApiContext _context;
+        private readonly MailingApiContext _context;
         public BuisnessLayer(MailingApiContext context)
         {
             _context = context;
@@ -22,8 +22,8 @@ namespace MailingApi.Layers
             if (group != null)
             {
                 var owner = _context.GroupOwners.Where(x => x.Id == group.GroupOwnerId).FirstOrDefault();
-                var consumers = _context.Consumers.Where(x => x.GroupId == groupId);
-                var model = new BuissnessModelGroup(consumers, group, owner);
+                var consumers = _context.Consumers.Where(x => x.GroupId == groupId).OrderBy(x => x.Id);
+                var model = new BuissnessModelGroup(consumers, group);
                 return model;
             }
             return null;

@@ -1,6 +1,7 @@
 using MailingApi.Controllers;
 using MailingApi.Layers;
 using MailingApi.Models;
+using MailingApiTests.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -16,76 +17,71 @@ namespace MailingApiTests
         private static BuisnessLayer buisness;
 
         [ClassInitialize]
-        public static void Initialize(TestContext testcontext)
+        public static void Initialize(TestContext _)
         {
             var options = new DbContextOptionsBuilder<MailingApiContext>().UseInMemoryDatabase(databaseName: "MailDatabase")
                 .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
             var context = new MailingApiContext(options);
             buisness = new BuisnessLayer(context);
             controller = new MailingController(buisness);
-            var user = new BuissnesModelUser()
-            {
-                Username = "TestUser",
-                Password = "Password"
-            };
+            
+            var user = BuissnesTestHelper.CreateBuissnesModelUser("TestUser", "Password");
             var userId = buisness.RegisterUser(user);
-            var model = new BuissnessModelGroup()
-            {
-                GroupName = "testName",
-                GroupOwnerId = userId,
-                OwnerName = "Owner",
-                Emails = new List<BuissnessModelEmails>() { new BuissnessModelEmails { Email = "a@a.com" } }
-            };
+            var emails = new List<string> { "a@a.com", "b@b.com" };
+            var model = BuissnesTestHelper.CreateBuissnessModelGroup(userId, "testName", emails);
+            var model2 = BuissnesTestHelper.CreateBuissnessModelGroup(userId, "testName2", emails);
             buisness.SaveBuissnesModelGroup(model);
-            var model2 = new BuissnessModelGroup()
-            {
-                GroupName = "testName2",
-                GroupOwnerId = userId,
-                OwnerName = "Owner2",
-                Emails = new List<BuissnessModelEmails>() { new BuissnessModelEmails { Email = "a@a.com" } }
-            };
             buisness.SaveBuissnesModelGroup(model2);
         }
+
+        #region Get
         [DataRow(-1)]
         [DataRow(10)]
         [TestMethod]
-        public void GetShoulReturnNotFound(int groupId)
+        public void GetGroupByIdShoulReturnNotFound(int groupId)
         {
             var expected = new NotFoundResult();
-            var actualGroup = controller.Get(groupId) as NotFoundResult;
-            Assert.AreEqual(expected.GetType(), actualGroup.GetType());
-            Assert.AreEqual(expected.StatusCode, actualGroup.StatusCode);
+            var actual = controller.GetGroupById(groupId) as NotFoundResult;
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+            Assert.AreEqual(expected.StatusCode, actual.StatusCode);
         }
-
         [TestMethod]
         [DataRow(1)]
         [DataRow(2)]
-        public void GetShoulReturnOK(int groupId)
+        public void GetGroupByIdShoulReturnOK(int groupId)
         {
             var expectedGroup = buisness.GetBuissnesModel(groupId);
-            var actualGroup = (controller.Get(groupId) as OkObjectResult).Value as BuissnessModelGroup;
-            var actualEmails = actualGroup.Emails as List<BuissnessModelEmails>;
-            var expectedEmails = expectedGroup.Emails as List<BuissnessModelEmails>;
-            Assert.AreEqual(actualGroup.Id, expectedGroup.Id);
-            Assert.AreEqual(actualGroup.GroupName, expectedGroup.GroupName);
-            Assert.AreEqual(actualGroup.OwnerName, expectedGroup.OwnerName);
-            Assert.AreEqual(actualGroup.GroupOwnerId, expectedGroup.GroupOwnerId);
-            Assert.AreEqual(actualEmails.Count, expectedEmails.Count);
-            Assert.AreEqual(actualEmails[0].Id, expectedEmails[0].Id);
-            Assert.AreEqual(actualEmails[0].Email, expectedEmails[0].Email);
+            var actualGroup = (controller.GetGroupById(groupId) as OkObjectResult).Value as BuissnessModelGroup;
+            BuissnesTestHelper.CompareBuissnessModelGroup(expectedGroup, actualGroup);
         }
-
+        #endregion
+        #region Post
         [TestMethod]
-        public void PostShoulReturnConfilct()
+        public void PostNewGroupShoulReturnUnauthorized()
         {
+            var emails = new List<string> { "email1Created", "email2Created" };
+            var group = BuissnesTestHelper.CreateBuissnessModelGroup(1, "CreatedName", emails);
 
+            var expected = new UnauthorizedResult();
+            var actual = controller.PostNewGroup(group) as UnauthorizedResult;
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+            Assert.AreEqual(expected.StatusCode, actual.StatusCode);
         }
-
         [TestMethod]
-        public void PostShoulReturnCreated()
+        public void PostNewGroupShoulReturnCreated()
         {
-        }
+            var emails = new List<string> { "email1Created", "email2Created" };
+            var expectedGroup = BuissnesTestHelper.CreateBuissnessModelGroup(1, "CreatedName", emails);
 
+            var result = controller.PostNewGroup(expectedGroup) as CreatedResult;
+            var id = (int)result.Value;
+            var actualGroup = buisness.GetBuissnesModel(id);
+            expectedGroup.Id = actualGroup.Id; // get generated by database Id
+            BuissnesTestHelper.CompareBuissnessModelGroup(expectedGroup, actualGroup);
+
+        }
+        #endregion
+        #region Put
         [TestMethod]
         public void PutShoulReturnCreated()
         {
@@ -100,7 +96,8 @@ namespace MailingApiTests
         public void PutShoulReturnOK()
         {
         }
-
+        #endregion
+        #region Delete
         [TestMethod]
         public void DeleteShoulReturnNotFound()
         {
@@ -110,5 +107,6 @@ namespace MailingApiTests
         public void DeleteShoulReturnOK()
         {
         }
+        #endregion
     }
 }
