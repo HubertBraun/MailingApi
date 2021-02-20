@@ -29,12 +29,12 @@ namespace MailingApi.Layers
             return null;
         }
 
-        public bool SaveBuissnesModelGroup(BuissnessModelGroup model)
+        public int SaveBuissnesModelGroup(BuissnessModelGroup model)
         {
             var group = new MailingGroup
             {
                 Name = model.GroupName,
-                GroupOwnerId = model.OwnerId
+                GroupOwnerId = model.GroupOwnerId
             };
             var consumers = new List<MailConsumer>();
             foreach(var e in model.Emails)
@@ -61,14 +61,28 @@ namespace MailingApi.Layers
             }
             catch(Exception e) // TODO: Logging
             {
-                return false;
+                return -1;
             }
-            return true;
+            return group.Id;
         }
 
-        public void RegisterUser()
+        public int RegisterUser(BuissnesModelUser user) // TODO: Identity
         {
-
+            var owner = new MailUser()
+            {
+                Password = user.Password,
+                Username = user.Username
+            };
+            try
+            {
+                _context.GroupOwners.Add(owner);
+                _context.SaveChanges();
+            }
+            catch(Exception e) // TODO: Logging
+            {
+                return -1;
+            }
+            return owner.Id;
         }
     }
 }

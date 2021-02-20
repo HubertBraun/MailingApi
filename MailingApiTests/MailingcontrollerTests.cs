@@ -23,14 +23,28 @@ namespace MailingApiTests
             var context = new MailingApiContext(options);
             buisness = new BuisnessLayer(context);
             controller = new MailingController(buisness);
+            var user = new BuissnesModelUser()
+            {
+                Username = "TestUser",
+                Password = "Password"
+            };
+            var userId = buisness.RegisterUser(user);
             var model = new BuissnessModelGroup()
             {
                 GroupName = "testName",
-                OwnerId = 1,
+                GroupOwnerId = userId,
                 OwnerName = "Owner",
-                Emails = new List<BuissnessModelEmails>() { new BuissnessModelEmails { Email="a@a.com"} }
+                Emails = new List<BuissnessModelEmails>() { new BuissnessModelEmails { Email = "a@a.com" } }
             };
             buisness.SaveBuissnesModelGroup(model);
+            var model2 = new BuissnessModelGroup()
+            {
+                GroupName = "testName2",
+                GroupOwnerId = userId,
+                OwnerName = "Owner2",
+                Emails = new List<BuissnessModelEmails>() { new BuissnessModelEmails { Email = "a@a.com" } }
+            };
+            buisness.SaveBuissnesModelGroup(model2);
         }
         [DataRow(-1)]
         [DataRow(10)]
@@ -52,17 +66,19 @@ namespace MailingApiTests
             var actualGroup = (controller.Get(groupId) as OkObjectResult).Value as BuissnessModelGroup;
             var actualEmails = actualGroup.Emails as List<BuissnessModelEmails>;
             var expectedEmails = expectedGroup.Emails as List<BuissnessModelEmails>;
-            Assert.AreEqual(actualGroup.GroupId, expectedGroup.GroupId);
+            Assert.AreEqual(actualGroup.Id, expectedGroup.Id);
             Assert.AreEqual(actualGroup.GroupName, expectedGroup.GroupName);
             Assert.AreEqual(actualGroup.OwnerName, expectedGroup.OwnerName);
-            Assert.AreEqual(actualGroup.OwnerId, expectedGroup.OwnerId);
+            Assert.AreEqual(actualGroup.GroupOwnerId, expectedGroup.GroupOwnerId);
             Assert.AreEqual(actualEmails.Count, expectedEmails.Count);
-            Assert.AreEqual(actualEmails[0], expectedEmails[0]);
+            Assert.AreEqual(actualEmails[0].Id, expectedEmails[0].Id);
+            Assert.AreEqual(actualEmails[0].Email, expectedEmails[0].Email);
         }
 
         [TestMethod]
         public void PostShoulReturnConfilct()
         {
+
         }
 
         [TestMethod]

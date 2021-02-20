@@ -28,7 +28,7 @@ namespace MailingApi.Layers
 
         public MailConsumer GetConsumer(int id)
         {
-            return Consumers.Where(x => x.ConsumerId == id).FirstOrDefault();
+            return Consumers.Where(x => x.Id == id).FirstOrDefault();
         }
 
         public MailingGroup GetGroup(int id)
