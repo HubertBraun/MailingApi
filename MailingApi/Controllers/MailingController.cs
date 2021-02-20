@@ -15,10 +15,10 @@ namespace MailingApi.Controllers
     [Route("[controller]")]
     public class MailingController : ControllerBase
     {
-        private readonly BuisnessLayer _context;
-        public MailingController(BuisnessLayer context)
+        private readonly BuisnessLayer _buisness;
+        public MailingController(BuisnessLayer buisness)
         {
-            _context = context;
+            _buisness = buisness;
         }
         /// <summary>
         /// Searchs for a group by Id
@@ -30,7 +30,7 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetGroupById(int groupId)
         {
-            var group = _context.GetBuissnesModel(groupId);
+            var group = _buisness.GetBuissnesModel(groupId);
             if (group is null)
             {
                 return NotFound();
@@ -46,7 +46,7 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public IActionResult PostNewGroup(BuissnessModelGroup group)
         {
-            var id = _context.SaveBuissnesModelGroup(group);
+            var id = _buisness.SaveBuissnesModelGroup(group);
             if (id != -1)
             {
                 return Created("", id); // TODO: routing
@@ -61,9 +61,15 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult PutGroup()
+        public IActionResult PutGroup(BuissnessModelGroup group)
         {
-            return NoContent();
+            var actualGroup = _buisness.GetBuissnesModel(group.Id);
+            
+            if (group is null)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
         /// <summary>
         /// 
@@ -73,8 +79,13 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult DeleteGroup()
+        public IActionResult DeleteGroup(int groupId)
         {
+            var result = _buisness.DeleteBuissnesModelGroup(groupId);
+            if(result)
+            {
+                return Ok();
+            }
             return NotFound();
         }
 

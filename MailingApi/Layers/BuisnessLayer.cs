@@ -37,7 +37,7 @@ namespace MailingApi.Layers
                 GroupOwnerId = model.GroupOwnerId
             };
             var consumers = new List<MailConsumer>();
-            foreach(var e in model.Emails)
+            foreach (var e in model.Emails)
             {
                 var consumer = new MailConsumer
                 {
@@ -59,11 +59,37 @@ namespace MailingApi.Layers
                 _context.SaveChanges();
                 transaction.Commit();
             }
-            catch(Exception e) // TODO: Logging
+            catch (Exception e) // TODO: Logging
             {
                 return -1;
             }
             return group.Id;
+        }
+
+        public bool DeleteBuissnesModelGroup(int groupId)
+        {
+            try
+            {
+                var group = _context.Groups.Where(x => x.Id == groupId).FirstOrDefault();
+                if (group != null)
+                {
+                    var consumers = _context.Consumers.Where(x => x.GroupId == groupId).OrderBy(x => x.Id);
+                    using var transaction = _context.Database.BeginTransaction();
+                    _context.Groups.Remove(group);
+                    foreach (var c in consumers)
+                    {
+                        _context.Consumers.Remove(c);
+                    }
+                    _context.SaveChanges();
+                    transaction.Commit();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e) // TODO: Logging
+            {
+                return false;
+            }
         }
 
         public int RegisterUser(BuissnesModelUser user) // TODO: Identity
@@ -78,7 +104,7 @@ namespace MailingApi.Layers
                 _context.GroupOwners.Add(owner);
                 _context.SaveChanges();
             }
-            catch(Exception e) // TODO: Logging
+            catch (Exception e) // TODO: Logging
             {
                 return -1;
             }
