@@ -6,9 +6,6 @@ using System.Linq;
 
 namespace MailingApi.Layers
 {
-    /// <summary>
-    /// Data Layer
-    /// </summary>
     public class MailingApiContext : DbContext
     {
         public DbSet<MailConsumer> Consumers { get; set; }
@@ -25,21 +22,5 @@ namespace MailingApi.Layers
             Groups = groups;
             GroupOwners = groupOwners;
         }
-
-        public MailConsumer GetConsumer(int id)
-        {
-            return Consumers.Where(x => x.Id == id).FirstOrDefault();
-        }
-
-        public MailingGroup GetGroup(int id)
-        {
-            return Groups.Where(x => x.Id == id).FirstOrDefault();
-        }
-
-        public MailUser GetUser(int id)
-        {
-            return GroupOwners.Where(x => x.Id == id).FirstOrDefault();
-        }
-
     }
 }

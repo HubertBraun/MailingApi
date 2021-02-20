@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace MailingApi.Models
 {
-    public class BuissnessModelGroup : IDentifier, IGroup
+    public class BusinessModelGroup : IDentifier, IGroup
     {
         public int Id { get; set; }
         public string GroupName { get; set; }
-        public IEnumerable<BuissnessModelEmails> Emails { get; set; }
+        public IEnumerable<BusinessModelEmails> Emails { get; set; }
         public int GroupOwnerId { get; set; }
 
-        public BuissnessModelGroup()
+        public BusinessModelGroup()
         {
 
         }
 
-        public BuissnessModelGroup(IEnumerable<MailConsumer> consumers, MailingGroup group)
+        public BusinessModelGroup(IEnumerable<MailConsumer> consumers, MailingGroup group)
         {
             Id = group.Id;
-            Emails = consumers.Select(x => new BuissnessModelEmails() { Email = x.ConsumerAddress, Id = x.Id }).ToList();
+            Emails = consumers.Select(x => new BusinessModelEmails() { Email = x.ConsumerAddress, Id = x.Id }).ToList();
             GroupOwnerId = group.GroupOwnerId;
             GroupName = group.Name;
         }

@@ -7,32 +7,32 @@ using System.Text;
 
 namespace MailingApiTests.Helper
 {
-    public static class BuissnesTestHelper
+    public static class BusinessTestHelper
     {
 
-        public static BuissnessModelGroup CreateBuissnessModelGroup(int userId, string groupName, IEnumerable<string> emails)
+        public static BusinessModelGroup CreateBusinessModelGroup(int userId, string groupName, IEnumerable<string> emails)
         {
-            return new BuissnessModelGroup()
+            return new BusinessModelGroup()
             {
                 GroupName = groupName,
                 GroupOwnerId = userId,
-                Emails = emails.Select(x => new BuissnessModelEmails { Email = x }).ToList(),
+                Emails = emails.Select(x => new BusinessModelEmails { Email = x }).ToList(),
             };
         }
 
-        public static BuissnesModelUser CreateBuissnesModelUser(string username, string password)
+        public static BusinessModelUser CreateBusinessModelUser(string username, string password)
         {
-            return new BuissnesModelUser()
+            return new BusinessModelUser()
             {
                 Username = username,
                 Password = password,
             };
         }
 
-        public static void CompareBuissnessModelGroup(BuissnessModelGroup expected, BuissnessModelGroup actual)
+        public static void CompareBusinessModelGroup(BusinessModelGroup expected, BusinessModelGroup actual)
         {
-            var actualEmails = expected.Emails as List<BuissnessModelEmails>;
-            var expectedEmails = actual.Emails as List<BuissnessModelEmails>;
+            var actualEmails = expected.Emails as List<BusinessModelEmails>;
+            var expectedEmails = actual.Emails as List<BusinessModelEmails>;
             Assert.AreEqual(expected.Id, actual.Id);
             Assert.AreEqual(expected.GroupName, actual.GroupName);
             Assert.AreEqual(expected.GroupOwnerId, actual.GroupOwnerId);

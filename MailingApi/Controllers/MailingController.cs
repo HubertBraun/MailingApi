@@ -15,8 +15,8 @@ namespace MailingApi.Controllers
     [Route("[controller]")]
     public class MailingController : ControllerBase
     {
-        private readonly BuisnessLayer _buisness;
-        public MailingController(BuisnessLayer buisness)
+        private readonly BusinessLayer _buisness;
+        public MailingController(BusinessLayer buisness)
         {
             _buisness = buisness;
         }
@@ -30,7 +30,7 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetGroupById(int groupId)
         {
-            var group = _buisness.GetBuissnesModel(groupId);
+            var group = _buisness.GetBusinessModel(groupId);
             if (group is null)
             {
                 return NotFound();
@@ -44,9 +44,9 @@ namespace MailingApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult PostNewGroup(BuissnessModelGroup group)
+        public IActionResult PostNewGroup(BusinessModelGroup group)
         {
-            var id = _buisness.SaveBuissnesModelGroup(group);
+            var id = _buisness.SaveBusinessModelGroup(group);
             if (id != -1)
             {
                 return Created("", id); // TODO: routing
@@ -61,9 +61,9 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult PutGroup(BuissnessModelGroup group)
+        public IActionResult PutGroup(BusinessModelGroup group)
         {
-            var actualGroup = _buisness.GetBuissnesModel(group.Id);
+            var actualGroup = _buisness.GetBusinessModel(group.Id);
             
             if (group is null)
             {
@@ -81,7 +81,7 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult DeleteGroup(int groupId)
         {
-            var result = _buisness.DeleteBuissnesModelGroup(groupId);
+            var result = _buisness.DeleteBusinessModelGroup(groupId);
             if(result)
             {
                 return Ok();
