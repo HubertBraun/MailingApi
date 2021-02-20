@@ -4,8 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MailingApi.Context
+namespace MailingApi.Layers
 {
+    /// <summary>
+    /// Data Layer
+    /// </summary>
     public class MailingApiContext : DbContext
     {
         public DbSet<MailConsumer> Consumers { get; set; }
@@ -23,13 +26,6 @@ namespace MailingApi.Context
             GroupOwners = groupOwners;
         }
 
-        private int AddAndSave(object o)
-        {
-            Add(o);
-            return SaveChanges();
-        }
-
-
         public MailConsumer GetConsumer(int id)
         {
             return Consumers.Where(x => x.ConsumerId == id).FirstOrDefault();
@@ -43,19 +39,6 @@ namespace MailingApi.Context
         public MailUser GetUser(int id)
         {
             return GroupOwners.Where(x => x.Id == id).FirstOrDefault();
-        }
-
-        public BuissnessModelGroup GetBuissnesModelGroup(int groupId)
-        {
-            var group = Groups.Where(x => x.Id == groupId).FirstOrDefault();
-            if (group != null)
-            {
-                var owner = GroupOwners.Where(x => x.Id == group.GroupOwnerId).FirstOrDefault();
-                var consumers = Consumers.Where(x => x.GroupId == groupId);
-                var model = new BuissnessModelGroup(consumers, group, owner);
-                return model;
-            }
-            return null;
         }
 
     }

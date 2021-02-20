@@ -1,9 +1,11 @@
-using MailingApi.Context;
 using MailingApi.Controllers;
+using MailingApi.Layers;
 using MailingApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace MailingApiTests
 {
@@ -11,43 +13,24 @@ namespace MailingApiTests
     public class MailingcontrollerTests
     {
         private static MailingController controller;
-        private static MailingApiContext context;
+        private static BuisnessLayer buisness;
 
         [ClassInitialize]
         public static void Initialize(TestContext testcontext)
         {
-            var options = new DbContextOptionsBuilder<MailingApiContext>().UseInMemoryDatabase(databaseName: "MailDatabase").Options;
-            context = new MailingApiContext(options);
-            controller = new MailingController(context);
-
-            var consumer = new MailConsumer
+            var options = new DbContextOptionsBuilder<MailingApiContext>().UseInMemoryDatabase(databaseName: "MailDatabase")
+                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
+            var context = new MailingApiContext(options);
+            buisness = new BuisnessLayer(context);
+            controller = new MailingController(buisness);
+            var model = new BuissnessModelGroup()
             {
-                ConsumerAddress = "testAddress",
+                GroupName = "testName",
+                OwnerId = 1,
+                OwnerName = "Owner",
+                Emails = new List<BuissnessModelEmails>() { new BuissnessModelEmails { Email="a@a.com"} }
             };
-            var owner = new MailUser
-            {
-                Username = "testName1"
-            };
-            var owner2 = new MailUser
-            {
-                Username = "testName2"
-            };
-            var group = new MailingGroup
-            {
-                Name = "testName1",
-                GroupOwnerId = 1,
-            };
-            var group2 = new MailingGroup
-            {
-                Name = "testName2",
-                GroupOwnerId = 2,
-            };
-            context.Add(consumer);
-            context.Add(group);
-            context.Add(group2);
-            context.Add(owner);
-            context.Add(owner2);
-            context.SaveChanges();
+            buisness.SaveBuissnesModelGroup(model);
         }
         [DataRow(-1)]
         [DataRow(10)]
@@ -65,13 +48,16 @@ namespace MailingApiTests
         [DataRow(2)]
         public void GetShoulReturnOK(int groupId)
         {
-            var expectedGroup = context.GetBuissnesModelGroup(groupId);
+            var expectedGroup = buisness.GetBuissnesModel(groupId);
             var actualGroup = (controller.Get(groupId) as OkObjectResult).Value as BuissnessModelGroup;
+            var actualEmails = actualGroup.Emails as List<BuissnessModelEmails>;
+            var expectedEmails = expectedGroup.Emails as List<BuissnessModelEmails>;
             Assert.AreEqual(actualGroup.GroupId, expectedGroup.GroupId);
             Assert.AreEqual(actualGroup.GroupName, expectedGroup.GroupName);
             Assert.AreEqual(actualGroup.OwnerName, expectedGroup.OwnerName);
             Assert.AreEqual(actualGroup.OwnerId, expectedGroup.OwnerId);
-            Assert.AreEqual(actualGroup.Emails.Count, expectedGroup.Emails.Count);
+            Assert.AreEqual(actualEmails.Count, expectedEmails.Count);
+            Assert.AreEqual(actualEmails[0], expectedEmails[0]);
         }
 
         [TestMethod]

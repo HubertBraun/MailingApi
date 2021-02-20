@@ -1,4 +1,4 @@
-﻿using MailingApi.Context;
+﻿using MailingApi.Layers;
 using MailingApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +15,8 @@ namespace MailingApi.Controllers
     [Route("[controller]")]
     public class MailingController : ControllerBase
     {
-        private readonly MailingApiContext _context;
-        public MailingController(MailingApiContext context)
+        private readonly BuisnessLayer _context;
+        public MailingController(BuisnessLayer context)
         {
             _context = context;
         }
@@ -31,7 +31,7 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(int groupId)
         {
-            var group = _context.GetBuissnesModelGroup(groupId);
+            var group = _context.GetBuissnesModel(groupId);
             if (group is null)
             {
                 return NotFound();
@@ -47,8 +47,9 @@ namespace MailingApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult Post(MailingGroup group)
+        public IActionResult Post(BuissnessModelGroup group)
         {
+            var result = _context.SaveBuissnesModelGroup(group);
             return NoContent();
         }
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MailingApi.Models
@@ -9,10 +10,11 @@ namespace MailingApi.Models
     {
         public int GroupId { get; set; }
         public string GroupName { get; set; }
-        public List<BuissnessModelEmails> Emails { get; set; }
-        public string OwnerName { get; set; }
+        public IEnumerable<BuissnessModelEmails> Emails { get; set; }
         public int OwnerId { get; set; }
-
+        public string OwnerName { get; set; }
+        [JsonIgnore]
+        public string OwnerPassword { get; set; }
         public BuissnessModelGroup()
         {
 
@@ -25,6 +27,7 @@ namespace MailingApi.Models
             OwnerId = group.GroupOwnerId;
             GroupName = group.Name;
             OwnerName = user.Username;
+            OwnerName = user.Password;
         }
     }
 }
