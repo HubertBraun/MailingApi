@@ -1,4 +1,5 @@
-﻿using MailingApi.Layers;
+﻿using MailingApi.Interfaces;
+using MailingApi.Layers;
 using MailingApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +16,8 @@ namespace MailingApi.Controllers
     [Route("[controller]")]
     public class MailingController : ControllerBase
     {
-        private readonly BusinessLayer _buisness;
-        public MailingController(BusinessLayer buisness)
+        private readonly IBusinessLayer _buisness;
+        public MailingController(IBusinessLayer buisness)
         {
             _buisness = buisness;
         }

@@ -1,4 +1,5 @@
-﻿using MailingApi.Models;
+﻿using MailingApi.Interfaces;
+using MailingApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace MailingApi.Layers
     /// <summary>
     /// Data Layer
     /// </summary>
-    public class DataLayer
+    public class DataLayer : IDataLayer
     {
         private MailingApiContext _context;
         public DataLayer(MailingApiContext context)
@@ -30,6 +31,11 @@ namespace MailingApi.Layers
         public IEnumerable<MailConsumer> SelectConsumersByGroupId(int groupId)
         {
             return _context.Consumers.Where(x => x.GroupId == groupId).OrderBy(x => x.Id).ToList();
+        }
+
+        public MailUser SelectUser(string username, string hashPassword)
+        {
+            return _context.GroupOwners.Where(x => x.Username == username && x.Password == hashPassword).FirstOrDefault();
         }
 
         public int InsertGroup(MailingGroup group, IEnumerable<MailConsumer> consumers)

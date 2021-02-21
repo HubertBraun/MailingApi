@@ -17,6 +17,7 @@ namespace MailingApi.Models
         [Column("con_address")]
         public string ConsumerAddress { get; set; }
         [Column("con_groupId")]
+        [ForeignKey("MailingGroup")]
         public int GroupId { get; set; }
     }
 

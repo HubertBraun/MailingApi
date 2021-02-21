@@ -24,10 +24,11 @@ namespace MailingApiTests
             var context = new MailingApiContext(options);
             var dataLayer = new DataLayer(context);
             _buisness = new BusinessLayer(dataLayer);
+            var authentication = new AuthenticationLayer(dataLayer);
             _controller = new MailingController(_buisness);
             
             var user = BusinessTestHelper.CreateBusinessModelUser("TestUser", "Password");
-            var userId = _buisness.RegisterUser(user);
+            var userId = authentication.RegisterUser(user);
             var emails = new List<string> { "a@a.com", "b@b.com" };
             var model = BusinessTestHelper.CreateBusinessModelGroup(userId, "testName", emails);
             var model2 = BusinessTestHelper.CreateBusinessModelGroup(userId, "testName2", emails);
