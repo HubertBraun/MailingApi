@@ -62,6 +62,35 @@ namespace MailingApiTests
             Assert.AreEqual(expectedConsumer.ConsumerAddress, actualConsumer.Email);
         }
 
+        [DataRow(1)]
+        [TestMethod]
+        public void GetAllBusinessModelShouldReturnGroup(int ownerId)
+        {
+            var expectedModels = _data.SelectGroupsByOwnerId(ownerId) as List<MailingGroup>;
+            var expectedModel = expectedModels[0];
+            var expectedConsumers = _data.SelectConsumersByGroupId(expectedModel.Id) as List<MailConsumer>;
+            var expectedConsumer = expectedConsumers[0];
+            var actualModels = _buisness.GetAllBusinessModel(ownerId) as List<BusinessModelGroup>;
+            var actualModel = actualModels[0];
+            var actualConsumers = actualModel.Emails as List<BusinessModelEmails>;
+            var actualConsumer = actualConsumers[0];
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual(ownerId, actualModel.GroupOwnerId);
+            Assert.AreEqual(expectedModel.Name, actualModel.GroupName);
+            Assert.AreEqual(expectedModel.GroupOwnerId, actualModel.GroupOwnerId);
+            Assert.AreEqual(expectedConsumers.Count, actualConsumers.Count);
+            Assert.AreEqual(expectedConsumer.ConsumerAddress, actualConsumer.Email);
+        }
+
+        [DataRow(10)]
+        [DataRow(-1)]
+        [TestMethod]
+        public void GetAllBusinessModelShouldReturnEmptyList(int ownerId)
+        {
+            var actualModels = _buisness.GetAllBusinessModel(ownerId) as List<BusinessModelGroup>;
+            Assert.AreEqual(0, actualModels.Count);
+        }
+
         [DataRow(10)]
         [DataRow(-1)]
         [TestMethod]

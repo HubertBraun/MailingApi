@@ -46,6 +46,26 @@ namespace MailingApiTests
 
         #region Select
         [DataRow(1)]
+        [TestMethod]
+        public void SelectGroupsByOwnerIdReturnGroups(int ownerId)
+        {
+            var actualGroups = _data.SelectGroupsByOwnerId(ownerId) as List<MailingGroup>;
+            Assert.IsNotNull(actualGroups);
+            Assert.AreEqual(ownerId, actualGroups[0].GroupOwnerId);
+            Assert.AreNotEqual(0, actualGroups.Count);
+        }
+
+        [DataRow(-1)]
+        [DataRow(10)]
+        [TestMethod]
+        public void SelectGroupsByOwnerIdReturnEmptyList(int ownerId)
+        {
+            var actualGroups = _data.SelectGroupsByOwnerId(ownerId) as List<MailingGroup>;
+            Assert.IsNotNull(actualGroups);
+            Assert.AreEqual(0, actualGroups.Count);
+        }
+
+        [DataRow(1)]
         [DataRow(2)]
         [TestMethod]
         public void SelectGroupByIdShouldReturnGroup(int groupId)

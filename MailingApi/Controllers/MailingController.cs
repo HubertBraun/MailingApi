@@ -105,7 +105,7 @@ namespace MailingApi.Controllers
             {
                 return NotFound();
             }
-            if (group.GroupOwnerId != actualGroup.GroupOwnerId)
+            if (GetUserId() != actualGroup.GroupOwnerId)
             {
                 return Unauthorized();
             }
