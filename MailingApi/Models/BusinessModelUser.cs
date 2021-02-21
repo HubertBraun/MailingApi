@@ -1,22 +1,17 @@
 ﻿using MailingApi.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MailingApi.Models
 {
-    [Table("MailUser")]
-    public class MailUser : IUser, IDentifier
+    public class BusinessModelUser : IUser, IDentifier
     {
-        [Key]
-        [Column("usr_id")]
         public int Id { get; set; }
-        [Column("usr_name")]
         public string Username { get; set; }
-        [Column("usr_password")]
+        [JsonIgnore]
         public string Password { get; set; }
     }
 }

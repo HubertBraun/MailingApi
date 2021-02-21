@@ -1,14 +1,23 @@
-﻿using System;
+﻿using MailingApi.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MailingApi.Models
 {
-    public class MailConsumer
+    [Table("MailConsumer")]
+    public class MailConsumer : IDentifier 
     {
+        [Key]
+        [Column("con_id")]
+        public int Id { get; set; }
+        [Column("con_address")]
         public string ConsumerAddress { get; set; }
-        public string ConsumerId { get; set; }
+        [Column("con_groupId")]
+        public int GroupId { get; set; }
     }
 
 }
