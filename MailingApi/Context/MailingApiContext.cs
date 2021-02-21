@@ -22,5 +22,11 @@ namespace MailingApi.Layers
             Groups = groups;
             GroupOwners = groupOwners;
         }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<MailUser>()
+                .HasIndex(x => x.Username)
+                .IsUnique();
+        }
     }
 }

@@ -10,5 +10,7 @@ namespace MailingApi.Interfaces
     public interface IUserAuthenticationService
     {
         BusinessModelUser Authenticate(string username, string password);
+
+        bool Register(string username, string password);
     }
 }

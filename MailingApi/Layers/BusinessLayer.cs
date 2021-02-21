@@ -17,6 +17,23 @@ namespace MailingApi.Layers
         {
             _data = data;
         }
+
+        public IEnumerable<BusinessModelGroup> GetAllBusinessModel(int ownerId)
+        {
+            var groups = _data.SelectGroupsByOwnerId(ownerId);
+            if (groups != null)
+            {
+                var model = new List<BusinessModelGroup>();
+                foreach(var g in groups)
+                {
+                    var consumers = _data.SelectConsumersByGroupId(g.Id);
+                    model.Add(new BusinessModelGroup(consumers, g));
+                }
+                return model;
+            }
+            return null;
+        }
+
         public BusinessModelGroup GetBusinessModel(int groupId)
         {
             var group = _data.SelectGroupById(groupId);

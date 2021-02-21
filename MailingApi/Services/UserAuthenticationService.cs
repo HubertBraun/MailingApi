@@ -18,20 +18,19 @@ namespace MailingApi.Services
     public class UserAuthenticationService : IUserAuthenticationService
     {
         private AppSettings _appSettings;
-        private AuthenticationLayer _layer;
-        public UserAuthenticationService(IOptions<AppSettings> appSettings, MailingApiContext context)
+        private IAuthenticationLayer _layer;
+        public UserAuthenticationService(IOptions<AppSettings> appSettings, IAuthenticationLayer layer)
         {
             _appSettings = appSettings.Value;
-            _layer = new AuthenticationLayer(new DataLayer(context));
+            _layer = layer;
         }
 
         public BusinessModelUser Authenticate(string username, string password)
         {
             var hasher = new PasswordHasher<string>();
-            var hash = hasher.HashPassword(username, password);
-            var user = _layer.GetUserWithoutPassword(username, hash);
-            
-            if (user == null)
+            var user = _layer.GetUser(username);
+            var verify = hasher.VerifyHashedPassword(username, user.Password, password);
+            if(user == null || verify == PasswordVerificationResult.Failed)
                 return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -41,8 +40,9 @@ namespace MailingApi.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, "User"),
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(_appSettings.TokenDurationInMinutes),
+                Expires = DateTime.UtcNow.AddHours(_appSettings.TokenDurationInMinutes),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -50,5 +50,12 @@ namespace MailingApi.Services
             return user;
         }
 
+        public bool Register(string username, string password)
+        {
+            var hasher = new PasswordHasher<string>();
+            var hash = hasher.HashPassword(username, password);
+            var user = _layer.RegisterUser(username, hash);
+            return user != -1;
+        }
     }
 }

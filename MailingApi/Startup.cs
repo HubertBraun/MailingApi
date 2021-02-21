@@ -79,11 +79,15 @@ namespace MailingApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mailing Api V1");
                 c.RoutePrefix = string.Empty;
             });
+            app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

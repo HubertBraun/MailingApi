@@ -10,6 +10,7 @@ namespace MailingApi.Interfaces
     {
         public int RegisterUser(BusinessModelUser user);
 
-        public BusinessModelUser GetUserWithoutPassword(string name, string hashPassword);
+        public BusinessModelUser GetUser(string name);
+        public int RegisterUser(string name, string hashPassword);
     }
 }

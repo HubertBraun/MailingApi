@@ -10,6 +10,8 @@ namespace MailingApi.Interfaces
     {
         public BusinessModelGroup GetBusinessModel(int groupId);
 
+        public IEnumerable<BusinessModelGroup> GetAllBusinessModel(int ownerId);
+
         public int SaveBusinessModelGroup(BusinessModelGroup model);
 
         public bool DeleteBusinessModelGroup(int groupId);

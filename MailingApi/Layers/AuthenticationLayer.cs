@@ -24,16 +24,32 @@ namespace MailingApi.Layers
             return _data.InsertUser(owner);
         }
 
-        public BusinessModelUser GetUserWithoutPassword(string name, string hashPassword)
+        public BusinessModelUser GetUser(string name)
         {
-            var user = _data.SelectUser(name, hashPassword);
-            var model = new BusinessModelUser
+            var user = _data.SelectUser(name);
+            if (user != null)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Password = "",
-            };
-            return model;
+                var model = new BusinessModelUser
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Password = user.Password,
+                    Role = Helper.Roles.User,
+                };
+                return model;
+            }
+            return null;
         }
+
+        public int RegisterUser(string name, string hashPassword)
+        {
+            var user = new MailUser
+            {
+                Password = hashPassword,
+                Username = name
+            };
+            return _data.InsertUser(user);
+        }
+
     }
 }

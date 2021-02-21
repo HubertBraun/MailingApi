@@ -17,6 +17,10 @@ namespace MailingApi.Layers
         {
             _context = context;
         }
+        public IEnumerable<MailingGroup> SelectGroupsByOwnerId(int ownerId)
+        {
+            return _context.Groups.Where(x => x.GroupOwnerId == ownerId).ToList();
+        }
 
         public MailingGroup SelectGroupById(int groupId)
         {
@@ -33,9 +37,9 @@ namespace MailingApi.Layers
             return _context.Consumers.Where(x => x.GroupId == groupId).OrderBy(x => x.Id).ToList();
         }
 
-        public MailUser SelectUser(string username, string hashPassword)
+        public MailUser SelectUser(string username)
         {
-            return _context.GroupOwners.Where(x => x.Username == username && x.Password == hashPassword).FirstOrDefault();
+            return _context.GroupOwners.Where(x => x.Username == username).FirstOrDefault();
         }
 
         public int InsertGroup(MailingGroup group, IEnumerable<MailConsumer> consumers)
