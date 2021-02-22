@@ -29,6 +29,8 @@ namespace MailingApi.Services
         {
             var hasher = new PasswordHasher<string>();
             var user = _layer.GetUser(username);
+            if (user == null)
+                return null;
             var verify = hasher.VerifyHashedPassword(username, user.Password, password);
             if(user == null || verify == PasswordVerificationResult.Failed)
                 return null;

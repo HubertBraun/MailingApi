@@ -12,6 +12,7 @@ namespace MailingApi.Models
         public int Id { get; set; }
         public string GroupName { get; set; }
         public IEnumerable<BusinessModelEmails> Emails { get; set; }
+        [JsonIgnore]
         public int GroupOwnerId { get; set; }
 
         public BusinessModelGroup()

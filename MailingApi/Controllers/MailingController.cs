@@ -18,8 +18,10 @@ namespace MailingApi.Controllers
     public class MailingController : ControllerBase
     {
         private readonly IBusinessLayer _buisness;
-        public MailingController(IBusinessLayer buisness)
+        private readonly ILogger _logger;
+        public MailingController(IBusinessLayer buisness, ILoggerFactory logFactory)
         {
+            _logger = logFactory.CreateLogger<MailingController>();
             _buisness = buisness;
         }
 
@@ -27,7 +29,6 @@ namespace MailingApi.Controllers
         {
            return int.Parse(User.Identity.Name);
         }
-
 
         /// <summary>
         /// Searchs for all groups owned by a user
@@ -37,12 +38,13 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public IActionResult GetAllGroups()
         {
             var group = _buisness.GetAllBusinessModel(GetUserId()) as List<BusinessModelGroup>;
             if (group is null || group.Count == 0)
             {
+                _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - NotFound");
                 return NotFound();
             }
             return Ok(group);
@@ -56,16 +58,18 @@ namespace MailingApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public IActionResult GetGroupById(int groupId)
         {
             var group = _buisness.GetBusinessModel(groupId);
             if(group.GroupOwnerId != GetUserId())
             {
+                _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - Unauthorized");
                 return Unauthorized();
             }
             if (group is null)
             {
+                _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - NotFound");
                 return NotFound();
             }
             return Ok(group);
@@ -84,8 +88,9 @@ namespace MailingApi.Controllers
             var id = _buisness.SaveBusinessModelGroup(group);
             if (id != -1)
             {
-                return Created("", id); // TODO: routing
+                return Created($"{Request.Path}/{id}", id); // TODO: routing
             }
+            _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - NoContent");
             return NoContent();
         }
         /// <summary>
@@ -103,10 +108,12 @@ namespace MailingApi.Controllers
             var actualGroup = _buisness.GetBusinessModel(group.Id);
             if (actualGroup is null)
             {
+                _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - NotFound");
                 return NotFound();
             }
             if (GetUserId() != actualGroup.GroupOwnerId)
             {
+                _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - Unauthorized");
                 return Unauthorized();
             }
             group.GroupOwnerId = GetUserId();
@@ -127,6 +134,7 @@ namespace MailingApi.Controllers
             var group = _buisness.GetBusinessModel(groupId);
             if(group.GroupOwnerId != GetUserId())
             {
+                _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - Unauthorized");
                 return Unauthorized();
             }
             var result = _buisness.DeleteBusinessModelGroup(groupId);
@@ -134,6 +142,7 @@ namespace MailingApi.Controllers
             {
                 return Ok();
             }
+            _logger.LogDebug($"{Environment.StackTrace} user: {GetUserId()} - NotFound");
             return NotFound();
         }
 
