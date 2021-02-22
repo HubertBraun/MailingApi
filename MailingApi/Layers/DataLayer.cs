@@ -1,4 +1,6 @@
-﻿using MailingApi.Models;
+﻿using MailingApi.Interfaces;
+using MailingApi.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +11,18 @@ namespace MailingApi.Layers
     /// <summary>
     /// Data Layer
     /// </summary>
-    public class DataLayer
+    public class DataLayer : IDataLayer
     {
+        private readonly ILogger _logger;
         private MailingApiContext _context;
-        public DataLayer(MailingApiContext context)
+        public DataLayer(MailingApiContext context, ILoggerFactory logFactory)
         {
+            _logger = logFactory.CreateLogger<DataLayer>();
             _context = context;
+        }
+        public IEnumerable<MailingGroup> SelectGroupsByOwnerId(int ownerId)
+        {
+            return _context.Groups.Where(x => x.GroupOwnerId == ownerId).ToList();
         }
 
         public MailingGroup SelectGroupById(int groupId)
@@ -30,6 +38,11 @@ namespace MailingApi.Layers
         public IEnumerable<MailConsumer> SelectConsumersByGroupId(int groupId)
         {
             return _context.Consumers.Where(x => x.GroupId == groupId).OrderBy(x => x.Id).ToList();
+        }
+
+        public MailUser SelectUser(string username)
+        {
+            return _context.GroupOwners.Where(x => x.Username == username).FirstOrDefault();
         }
 
         public int InsertGroup(MailingGroup group, IEnumerable<MailConsumer> consumers)
@@ -48,8 +61,9 @@ namespace MailingApi.Layers
                 transaction.Commit();
                 return group.Id;
             }
-            catch(Exception e) // TODO: Logging
+            catch(Exception e)
             {
+                _logger.LogError(e, "error", new string[0]);
                 return -1;
             }
         }
@@ -71,8 +85,9 @@ namespace MailingApi.Layers
                 }
                 return false;
             }
-            catch (Exception e) // TODO: Logging
+            catch (Exception e)
             {
+                _logger.LogError(e, "error", new string[0]);
                 return false;
             }
         }
@@ -96,8 +111,9 @@ namespace MailingApi.Layers
                 }
                 return false;
             }
-            catch (Exception e) // TODO: Logging
+            catch (Exception e)
             {
+                _logger.LogError(e, "error", new string[0]);
                 return false;
             }
         }
@@ -110,8 +126,9 @@ namespace MailingApi.Layers
                 _context.SaveChanges();
                 return owner.Id;
             }
-            catch (Exception e) // TODO: Logging
+            catch (Exception e)
             {
+                _logger.LogError(e, "error", new string[0]);
                 return -1;
             }
         }

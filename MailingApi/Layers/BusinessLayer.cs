@@ -1,4 +1,5 @@
-﻿using MailingApi.Models;
+﻿using MailingApi.Interfaces;
+using MailingApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,30 @@ namespace MailingApi.Layers
     /// <summary>
     /// Business logic layer
     /// </summary>
-    public class BusinessLayer
+    public class BusinessLayer : IBusinessLayer
     {
-        private readonly DataLayer _data;
-        public BusinessLayer(DataLayer data)
+        private readonly IDataLayer _data;
+        public BusinessLayer(IDataLayer data)
         {
             _data = data;
         }
+
+        public IEnumerable<BusinessModelGroup> GetAllBusinessModel(int ownerId)
+        {
+            var groups = _data.SelectGroupsByOwnerId(ownerId);
+            if (groups != null)
+            {
+                var model = new List<BusinessModelGroup>();
+                foreach(var g in groups)
+                {
+                    var consumers = _data.SelectConsumersByGroupId(g.Id);
+                    model.Add(new BusinessModelGroup(consumers, g));
+                }
+                return model;
+            }
+            return null;
+        }
+
         public BusinessModelGroup GetBusinessModel(int groupId)
         {
             var group = _data.SelectGroupById(groupId);
@@ -65,16 +83,5 @@ namespace MailingApi.Layers
                 .Select(x => new MailConsumer { ConsumerAddress = x.Email, GroupId = model.Id }).ToList();
             return _data.UpdateGroup(model.Id, group, consumers);
         }
-
-        public int RegisterUser(BusinessModelUser user) // TODO: Identity
-        {
-            var owner = new MailUser()
-            {
-                Password = user.Password,
-                Username = user.Username
-            };
-            return _data.InsertUser(owner);
-        }
-
     }
 }
