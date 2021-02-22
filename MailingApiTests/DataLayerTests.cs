@@ -3,6 +3,8 @@ using MailingApi.Models;
 using MailingApiTests.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -22,7 +24,9 @@ namespace MailingApiTests
             var options = new DbContextOptionsBuilder<MailingApiContext>().UseInMemoryDatabase(databaseName: "DataLayerTests")
             .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
             _context = new MailingApiContext(options);
-            _data = new DataLayer(_context);
+            var serviceProvider = new ServiceCollection().AddLogging().BuildServiceProvider();
+            var factory = serviceProvider.GetService<ILoggerFactory>();
+            _data = new DataLayer(_context, factory);
             var owner = DataLayerTestHelper.CreateMailUser("name", "password");
             _context.GroupOwners.Add(owner);
             _context.SaveChanges();
